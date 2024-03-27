@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'news_app.apps.NewsAppConfig',
     'accounts.apps.AccountConfig',
     'rest_framework',
-    'rest_framework_simplejwt'
-
+    'rest_framework_simplejwt',
+    # drf_yasg
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +130,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
 
     )
 }
@@ -174,3 +176,5 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+

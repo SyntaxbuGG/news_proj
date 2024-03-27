@@ -11,3 +11,7 @@ class UserSerializerSimple(serializers.ModelSerializer):
         model = User
         fields = ['url', 'username', 'email', 'last_login', 'date_joined']
 
+
+
+
+

@@ -11,11 +11,11 @@ class ProductImageAdmin(admin.TabularInline):
 @admin.register(models.News)
 class NewsAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
-    fields = ['title','subtitle','content','author','category','tags','created_at','updated_at']
+    fields = ['title','subtitle','content','author','category','tags']
     list_display = ['created_at','updated_at','author']
-    readonly_fields = ['created_at', 'updated_at']
     inlines = [ProductImageAdmin]
 
 
+admin.site.register(models.Like)
 admin.site.register(models.Category)
 admin.site.register(models.Tag)

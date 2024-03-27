@@ -24,24 +24,35 @@ class Tag(models.Model):
 
 class News(models.Model):
     title = models.CharField(max_length=255, unique=True)
-    subtitle = models.CharField(max_length=255, unique=True,blank=True,null=True)
+    subtitle = models.CharField(max_length=255, unique=True, blank=True, null=True)
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE , related_name='author')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name='category')
-    tags = models.ManyToManyField(Tag,blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
+    tags = models.ManyToManyField(Tag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(unique=True, blank=True)
 
-    # slug automatic save
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.subtitle)
 
-        super().save(*args, **kwargs)
+    # slug = models.SlugField(blank=True,null=True)
+    #
+    # # slug automatic save
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.subtitle)
+    #
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blog = models.ForeignKey(News, on_delete=models.CASCADE,related_name='like')
+    liked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'blog']
 
 
 def image_upload(instance, filename):
