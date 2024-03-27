@@ -12,7 +12,7 @@ class ProductImageAdmin(admin.TabularInline):
 class NewsAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
     fields = ['title','subtitle','content','author','category','tags']
-    list_display = ['created_at','updated_at','author']
+    list_display = ['title','updated_at','author']
     inlines = [ProductImageAdmin]
 
 
