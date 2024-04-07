@@ -8,23 +8,27 @@ User = get_user_model()
 
 class UserRegSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    phone = serializers.CharField(required=False)
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
+        fields = ['username', 'password','phone']
 
     def create(self, validated_data):
-        user = User(
-            email=validated_data['email'],
-            username=validated_data['username']
-        )
-        user.set_password(validated_data['password'])  # Хэшируем пароль перед сохранением
+        phone = validated_data.pop('phone', None)  # Удаляем phone из validated_data
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data['password'])
         user.save()
+        if phone:
+            user.phone = phone
+            user.save()
         return user
 
 
-
 class UserSerializer(serializers.ModelSerializer):
+    phone = serializers.CharField(required=False)
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'last_login', 'date_joined', ]
+        fields = ['url', 'username','phone', 'email', 'last_login', 'date_joined']
         read_only_fields = ['last_login', 'date_joined']
+
+
