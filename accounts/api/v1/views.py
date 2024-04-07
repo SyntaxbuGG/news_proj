@@ -1,5 +1,5 @@
 from drf_yasg import openapi
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status,filters
 
 from . import serializers
 from django.contrib.auth import get_user_model
@@ -14,6 +14,8 @@ User = get_user_model()
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username','phone','email']
 
     def get_permissions(self):
         if self.action in ['retrieve', 'list', 'update', 'delete']:
