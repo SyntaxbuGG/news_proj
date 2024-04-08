@@ -1,12 +1,12 @@
+from django.contrib.auth.hashers import check_password
 from drf_yasg import openapi
-from rest_framework import viewsets, status,filters
+from rest_framework import viewsets, status, filters
 
 from . import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from drf_yasg.utils import swagger_auto_schema
-
 
 User = get_user_model()
 
@@ -15,7 +15,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['username','phone','email']
+    search_fields = ['username', 'phone', 'email']
 
     def get_permissions(self):
         if self.action in ['retrieve', 'list', 'update', 'delete']:
@@ -32,10 +32,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description="Обновление информации о пользователе",
-        request_body=serializers.UserSerializer,
+        request_body=serializers.UserRegSerializer,
 
     )
     def update(self, request, *args, **kwargs):
+
         # Получаем пользователя, которого пытаются изменить
         user_to_update = self.get_object()
 
@@ -44,8 +45,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({'errors': "You don't have permission to update this user."},
                                 status=status.HTTP_403_FORBIDDEN)
 
-        # Добавляем примеры данных в Swagger схему
         return super().update(request, *args, **kwargs)
+
     def destroy(self, request, *args, **kwargs):
         user_to_delete = self.get_object()
         if not request.user.is_superuser:
@@ -54,3 +55,22 @@ class UserViewSet(viewsets.ModelViewSet):
                                 status=status.HTTP_403_FORBIDDEN)
 
         return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(request_body=serializers.UserChangePassword)
+    def update_password(self, request, pk=None):
+        user = self.get_object()
+        serializer = serializers.UserChangePassword(user, data=request.data)
+        if serializer.is_valid():
+            old_password = request.data.get('old_password')
+            new_password = request.data.get('new_password')
+
+            if not old_password:
+                return Response({'error': 'Old password is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not check_password(old_password, user.password):
+                return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(new_password)
+            user.save()
+            return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
