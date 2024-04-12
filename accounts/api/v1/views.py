@@ -18,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['username', 'phone', 'email']
 
     def get_permissions(self):
-        if self.action in ['retrieve', 'list', 'update', 'delete']:
+        if self.action in ['delete']:
             return [IsAuthenticated()]
         return [AllowAny()]
 
@@ -30,22 +30,22 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_description="Обновление информации о пользователе",
-        request_body=serializers.UserRegSerializer,
-
-    )
-    def update(self, request, *args, **kwargs):
-
-        # Получаем пользователя, которого пытаются изменить
-        user_to_update = self.get_object()
-
-        if not request.user.is_superuser:
-            if request.user != user_to_update:
-                return Response({'errors': "You don't have permission to update this user."},
-                                status=status.HTTP_403_FORBIDDEN)
-
-        return super().update(request, *args, **kwargs)
+    # @swagger_auto_schema(
+    #     operation_description="Обновление информации о пользователе",
+    #     request_body=serializers.UserRegSerializer,
+    #
+    # )
+    # def update(self, request, *args, **kwargs):
+    #
+    #     # Получаем пользователя, которого пытаются изменить
+    #     user_to_update = self.get_object()
+    #
+    #     if not request.user.is_superuser:
+    #         if request.user != user_to_update:
+    #             return Response({'errors': "You don't have permission to update this user."},
+    #                             status=status.HTTP_403_FORBIDDEN)
+    #
+    #     return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         user_to_delete = self.get_object()

@@ -16,14 +16,14 @@ from ...models import Like
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 
 class NewsViewSet(viewsets.ModelViewSet):
     queryset = models.News.objects.all()
     serializer_class = serializers.NewsSerializers
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication,SessionAuthentication,BasicAuthentication]
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication,SessionAuthentication,BasicAuthentication]
 
     @action(detail=True, methods=['post'])
     def like_blog(self, request, pk=None):

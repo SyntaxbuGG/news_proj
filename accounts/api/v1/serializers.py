@@ -21,13 +21,11 @@ class UserChangePassword(serializers.ModelSerializer):
 
 
 class UserRegSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    phone = serializers.CharField(required=False)
-
+    password = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'phone']
-        extra_kwargs = {'id': {'read_only': True}, 'phone': {'required': False}}
+        fields = ['id', 'username', 'password', 'phone','email']
+        extra_kwargs = {'id': {'read_only': True},'username':{'required':False}, 'phone': {'required': False}}
 
     def create(self, validated_data):
         phone = validated_data.pop('phone', None)  # Удаляем phone из validated_data
@@ -42,8 +40,9 @@ class UserRegSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ['url', 'username', 'phone', 'email', 'last_login', 'date_joined']
-        read_only_fields = ['last_login', 'date_joined']
+        fields = ['url','id','username', 'phone', 'email', 'last_login', 'date_joined']
+        read_only_fields = ['id','last_login', 'date_joined']
