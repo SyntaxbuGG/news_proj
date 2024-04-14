@@ -36,6 +36,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     )
     def update(self, request, *args, **kwargs):
+        serializer = serializers.UserRegSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
         #     # Получаем пользователя, которого пытаются изменить
         #     user_to_update = self.get_object()
