@@ -23,6 +23,7 @@ class UserChangePassword(serializers.ModelSerializer):
 class UserRegSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     email = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = User
@@ -43,13 +44,13 @@ class UserRegSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
+        validated_data['username'] = self.initial_data.get('username', instance.username)
 
-        # Устанавливаем новый пароль, если он передан
-        if password is not None:
+        # Проверяем, был ли передан пароль, и устанавливаем его, если был
+        password = validated_data.get('password')
+        if password:
             instance.set_password(password)
 
-        # Сохраняем пользователя
         instance.save()
         return instance
 

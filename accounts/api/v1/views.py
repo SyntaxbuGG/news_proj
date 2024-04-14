@@ -13,7 +13,6 @@ User = get_user_model()
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = serializers.UserSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', 'phone', 'email']
 
@@ -21,6 +20,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action in ['delete']:
             return [IsAuthenticated()]
         return [AllowAny()]
+
+    def get_serializer_class(self):
+        # Проверяем тип запроса и возвращаем соответствующий сериализатор
+        if self.request.method == 'PUT' or self.request.method == 'PATCH':
+            return serializers.UserRegSerializer
+        else:
+            return serializers.UserSerializer
 
     @swagger_auto_schema(request_body=serializers.UserRegSerializer)
     def create(self, request, *args, **kwargs):
@@ -36,12 +42,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     )
     def update(self, request, *args, **kwargs):
-        serializer = serializers.UserRegSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
         #     # Получаем пользователя, которого пытаются изменить
         #     user_to_update = self.get_object()
         #
@@ -50,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         #             return Response({'errors': "You don't have permission to update this user."},
         #                             status=status.HTTP_403_FORBIDDEN)
         #
-        return super().update(request, *args, **kwargs)
+
 
     def destroy(self, request, *args, **kwargs):
         user_to_delete = self.get_object()
