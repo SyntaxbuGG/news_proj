@@ -30,11 +30,12 @@ class UserRegSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         phone = validated_data.pop('phone', None)  # Удаляем phone из validated_data
         user = User.objects.create(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        if phone:
-            user.phone = phone
+        if not user.has_usable_password():
+            user.set_password(validated_data['password'])
             user.save()
+            if phone:
+                user.phone = phone
+                user.save()
         return user
 
 
